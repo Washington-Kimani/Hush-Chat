@@ -2,6 +2,7 @@ import User from "../models/user.model.js";
 import Message from "../models/message.model.js";
 
 import cloudinary from "../lib/cloudinary.js";
+import streamifier from "streamifier";
 import { getReceiverSocketId, io } from "../lib/socket.js";
 
 export const getUsersForSidebar = async (req, res) => {
@@ -37,14 +38,30 @@ export const getMessages = async (req, res) => {
 
 export const sendMessage = async (req, res) => {
   try {
-    const { text, image } = req.body;
+    // text may come from form-data field or JSON
+    const text = req.body.text || req.body?.message || "";
+    const imageBase64 = req.body.image;
     const { id: receiverId } = req.params;
     const senderId = req.user._id;
 
     let imageUrl;
-    if (image) {
-      // Upload base64 image to cloudinary
-      const uploadResponse = await cloudinary.uploader.upload(image);
+    // If a file was uploaded via multer (memory storage), stream it to Cloudinary
+    if (req.file && req.file.buffer) {
+      const uploadFromBuffer = (buffer) => {
+        return new Promise((resolve, reject) => {
+          const uploadStream = cloudinary.uploader.upload_stream({ folder: "hush_chat/messages" }, (error, result) => {
+            if (error) return reject(error);
+            resolve(result);
+          });
+          streamifier.createReadStream(buffer).pipe(uploadStream);
+        });
+      };
+
+      const result = await uploadFromBuffer(req.file.buffer);
+      imageUrl = result.secure_url;
+    } else if (imageBase64) {
+      // Fallback: upload base64 image (legacy)
+      const uploadResponse = await cloudinary.uploader.upload(imageBase64);
       imageUrl = uploadResponse.secure_url;
     }
 
