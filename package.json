@@ -1,13 +1,39 @@
 {
   "name": "hush-chat",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "scripts": {
-    "build": "npm install --prefix backend && npm install --prefix frontend && npm run build --prefix frontend",
-    "start": "npm run start --prefix backend"
+  "description": "A real-time chat application",
+  "homepage": "https://github.com/Washington-Kimani/Hush-Chat#readme",
+  "bugs": {
+    "url": "https://github.com/Washington-Kimani/Hush-Chat/issues"
   },
-  "keywords": [],
-  "author": "",
-  "license": "MIT"
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Washington-Kimani/Hush-Chat.git"
+  },
+  "license": "MIT",
+  "author": "Washington Kimani",
+  "type": "module",
+  "main": "backend/src/index.js",
+  "scripts": {
+    "server": "nodemon backend/src/index.js",
+    "client": "npm run dev --prefix frontend",
+    "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "start": "node backend/src/index.js",
+    "build": "npm install && npm install --prefix frontend && npm run build --prefix frontend"
+  },
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "cloudinary": "^2.10.0",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "jsonwebtoken": "^9.0.3",
+    "mongoose": "^9.6.3",
+    "socket.io": "^4.8.3"
+  },
+  "devDependencies": {
+    "concurrently": "^10.0.3",
+    "nodemon": "^3.1.14"
+  }
 }
